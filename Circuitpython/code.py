@@ -148,7 +148,10 @@ comp_point = ('NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WS
 grid_upper = 'ABCDEFGHIJKLMNOPQRSTUVWX'
 grid_lower = 'abcdefghijklmnopqrstuvwx'
 
+
 # CALCULATE AND FORMAT UTC TIME, UTC DATE, TIMEZONE TIME AND TIMEZONE DATE. CALCULATE DST
+
+
 class comp_date_time:
     def __init__(self, base_time_secs):
         time_utc_tuple = time.localtime(base_time_secs)
@@ -205,9 +208,12 @@ class comp_date_time:
 
         self.tz_desc = timezone_desc[dst_active]
 
+
 # SEND UBX MESSAGES TO GPS
 # WAITS FOR ACK/NAK, RETRANSMITS ON FAILED RESPONSE
 # RETURNS TRUE FOR ACK, FALSE FOR NAK
+
+
 def ubx_send(msg_type, msg_class, msg_payload):
     msg_len = len(msg_class) + len(msg_payload)
     msg_base = msg_type + msg_len.to_bytes(2, 'little') + msg_class + msg_payload
@@ -233,7 +239,10 @@ def ubx_send(msg_type, msg_class, msg_payload):
 
         time.sleep(0.1)
 
+
 # CALCULATE CHECKSUMS FOR UBX MESSAGES
+
+
 def ubx_checksum(msg):
     cs_a = 0x00
     cs_b = 0x00
@@ -245,7 +254,10 @@ def ubx_checksum(msg):
     checksum = (cs_a & 255).to_bytes(1, 'big') + (cs_b & 255).to_bytes(1, 'big')
     return checksum
 
+
 # CALCULATE MAIDENHEAD GRID SQUARE BASED ON CURRENT LAT / LON
+
+
 def calc_grid(latitude, longitude):
     grid_lat_adj = latitude + 90
     grid_lat_sq = grid_upper[int(grid_lat_adj / 10)]
@@ -255,13 +267,16 @@ def calc_grid(latitude, longitude):
 
     grid_lon_adj = longitude + 180
     grid_lon_sq = grid_upper[int(grid_lon_adj / 20)]
-    grid_lon_field = str(int((grid_lon_adj/2) % 10))
+    grid_lon_field = str(int((grid_lon_adj / 2) % 10))
     grid_lon_rem = (grid_lon_adj - int(grid_lon_adj / 2) * 2) * 60
     grid_lon_subsq = grid_lower[int(grid_lon_rem / 5)]
 
     return grid_lon_sq + grid_lat_sq + grid_lon_field + grid_lat_field + grid_lon_subsq + grid_lat_subsq
 
+
 # CALCULATE ANGLE FROM MAGNETOMETER DATA
+
+
 def comp_degree(x_axis, y_axis):
     x_axis -= offset_x_axis
     y_axis -= offset_y_axis
@@ -280,9 +295,9 @@ def comp_degree(x_axis, y_axis):
     elif (x_axis < 0) and (y_axis == 0):
         angle = 180 + declination
     elif y_axis > 0:
-        angle = 90 - math.atan(x_axis/y_axis) * 180 / math.pi + declination
+        angle = 90 - math.atan(x_axis / y_axis) * 180 / math.pi + declination
     elif y_axis < 0:
-        angle = 270 - math.atan(x_axis/y_axis) * 180 / math.pi + declination
+        angle = 270 - math.atan(x_axis / y_axis) * 180 / math.pi + declination
 
     if angle < 0:
         angle += 360
@@ -292,7 +307,10 @@ def comp_degree(x_axis, y_axis):
 
     return angle
 
+
 # CALCULATE COMPASS DIRECTION FROM ANGLE
+
+
 def comp_direction(degrees):
     if degrees == -1:
         direction = '---'
@@ -308,7 +326,10 @@ def comp_direction(degrees):
 
     return direction
 
+
 # CALCULATE BATTERY PERCENTAGE
+
+
 def bat_level(adc_value):
     bat_percent = 0
 
@@ -318,6 +339,7 @@ def bat_level(adc_value):
             break
 
     return bat_percent
+
 
 # SETUP CLOCK
 clock = rtc.RTC()
@@ -488,38 +510,38 @@ bat_progress_bar = HorizontalProgressBar((disp_x - bat_x, 0), (bat_x, bat_y), va
 disp_group.append(bat_progress_bar)
 
 # DISPLAY TIME AND DATE FIELDS
-utc_clock_text = bitmap_label.Label(font, text=' '*8, color=clock_color, x=0, y=char_start)
+utc_clock_text = bitmap_label.Label(font, text=' ' * 8, color=clock_color, x=0, y=char_start)
 disp_group.append(utc_clock_text)
 
 utc_clock_label = bitmap_label.Label(font, text='UTC', color=clock_color, x=char_width * 9, y=char_start)
 disp_group.append(utc_clock_label)
 
-utc_date_text = bitmap_label.Label(font, text=' '*16, color=date_color, x=0, y=char_start + char_height + line_space)
+utc_date_text = bitmap_label.Label(font, text=' ' * 16, color=date_color, x=0, y=char_start + char_height + line_space)
 disp_group.append(utc_date_text)
 
-tz_clock_text = bitmap_label.Label(font, text=' '*8, color=clock_color, x=0, y=char_start + (char_height + line_space) * 2 + line_gap)
+tz_clock_text = bitmap_label.Label(font, text=' ' * 8, color=clock_color, x=0, y=char_start + (char_height + line_space) * 2 + line_gap)
 disp_group.append(tz_clock_text)
 
 tz_clock_label = bitmap_label.Label(font, text='   ', color=clock_color, x=char_width * 9, y=char_start + (char_height + line_space) * 2 + line_gap)
 disp_group.append(tz_clock_label)
 
-tz_date_text = bitmap_label.Label(font, text=' '*16, color=date_color, x=0, y=char_start + (char_height + line_space) * 3 + line_gap)
+tz_date_text = bitmap_label.Label(font, text=' ' * 16, color=date_color, x=0, y=char_start + (char_height + line_space) * 3 + line_gap)
 disp_group.append(tz_date_text)
 
 # DISPLAY LATITUDE / LONGITUDE / ALTITUDE / GRID / COMPASS FIELDS
 lat_label = bitmap_label.Label(font, text='Lat:', color=location_color, x=0, y=char_start + (char_height + line_space) * 4 + line_gap * 2)
 disp_group.append(lat_label)
 
-lat_text = bitmap_label.Label(font, text=' '*8, color=location_color, x=char_width * 6, y=char_start + (char_height + line_space) * 4 + line_gap * 2)
+lat_text = bitmap_label.Label(font, text=' ' * 8, color=location_color, x=char_width * 6, y=char_start + (char_height + line_space) * 4 + line_gap * 2)
 disp_group.append(lat_text)
 
-grid_text = bitmap_label.Label(font, text=' '*6, color=grid_color, x=char_width * 20, y=char_start + (char_height + line_space) * 4 + line_gap * 2)
+grid_text = bitmap_label.Label(font, text=' ' * 6, color=grid_color, x=char_width * 20, y=char_start + (char_height + line_space) * 4 + line_gap * 2)
 disp_group.append(grid_text)
 
 lon_label = bitmap_label.Label(font, text='Lon:', color=location_color, x=0, y=char_start + (char_height + line_space) * 5 + line_gap * 2)
 disp_group.append(lon_label)
 
-lon_text = bitmap_label.Label(font, text=' '*9, color=location_color, x=char_width * 5, y=char_start + (char_height + line_space) * 5 + line_gap * 2)
+lon_text = bitmap_label.Label(font, text=' ' * 9, color=location_color, x=char_width * 5, y=char_start + (char_height + line_space) * 5 + line_gap * 2)
 disp_group.append(lon_text)
 
 gps_update_text = bitmap_label.Label(font, text=' ', color=gps_color, x=char_width * 25, y=char_start + (char_height + line_space) * 5 + line_gap * 2)
@@ -529,13 +551,13 @@ disp_group.append(gps_update_text)
 alt_label = bitmap_label.Label(font, text='Alt:', color=location_color, x=0, y=char_start + (char_height + line_space) * 6 + line_gap * 3)
 disp_group.append(alt_label)
 
-alt_ft_text = bitmap_label.Label(font, text=' '*5, color=location_color, x=char_width * 6, y=char_start + (char_height + line_space) * 6 + line_gap * 3)
+alt_ft_text = bitmap_label.Label(font, text=' ' * 5, color=location_color, x=char_width * 6, y=char_start + (char_height + line_space) * 6 + line_gap * 3)
 disp_group.append(alt_ft_text)
 
 alt_ft_label = bitmap_label.Label(font, text='FT', color=location_color, x=char_width * 12, y=char_start + (char_height + line_space) * 6 + line_gap * 3)
 disp_group.append(alt_ft_label)
 
-alt_m_text = bitmap_label.Label(font, text=' '*5, color=location_color, x=char_width * 19, y=char_start + (char_height + line_space) * 6 + line_gap * 3)
+alt_m_text = bitmap_label.Label(font, text=' ' * 5, color=location_color, x=char_width * 19, y=char_start + (char_height + line_space) * 6 + line_gap * 3)
 disp_group.append(alt_m_text)
 
 alt_m_label = bitmap_label.Label(font, text='M', color=location_color, x=char_width * 25, y=char_start + (char_height + line_space) * 6 + line_gap * 3)
@@ -544,13 +566,13 @@ disp_group.append(alt_m_label)
 speed_label = bitmap_label.Label(font, text='Spd:', color=location_color, x=0, y=char_start + (char_height + line_space) * 7 + line_gap * 3)
 disp_group.append(speed_label)
 
-speed_text = bitmap_label.Label(font, text=' '*5, color=location_color, x=char_width * 6, y=char_start + (char_height + line_space) * 7 + line_gap * 3)
+speed_text = bitmap_label.Label(font, text=' ' * 5, color=location_color, x=char_width * 6, y=char_start + (char_height + line_space) * 7 + line_gap * 3)
 disp_group.append(speed_text)
 
-track_label = bitmap_label.Label(font, text='Trk:', color=location_color, x=char_width * 13  , y=char_start + (char_height + line_space) * 7 + line_gap * 3)
+track_label = bitmap_label.Label(font, text='Trk:', color=location_color, x=char_width * 13, y=char_start + (char_height + line_space) * 7 + line_gap * 3)
 disp_group.append(track_label)
 
-track_text = bitmap_label.Label(font, text=' '*5, color=location_color, x=char_width * 19, y=char_start + (char_height + line_space) * 7 + line_gap * 3)
+track_text = bitmap_label.Label(font, text=' ' * 5, color=location_color, x=char_width * 19, y=char_start + (char_height + line_space) * 7 + line_gap * 3)
 disp_group.append(track_text)
 
 sat_count_label = bitmap_label.Label(font, text='Satellites:', color=sat_color, x=0, y=char_start + (char_height + line_space) * 8 + line_gap * 4)
@@ -561,6 +583,7 @@ disp_group.append(sat_count_text)
 
 comp_text = bitmap_label.Label(font, text='   ', color=compass_color, x=char_width * 23, y=char_start + (char_height + line_space) * 8 + line_gap * 4)
 disp_group.append(comp_text)
+
 
 def main():
     last_alt = None
@@ -619,12 +642,12 @@ def main():
             if last_lat != curr_lat:
                 last_lat = curr_lat
                 pad_length = 8 - len('{0:.4f}'.format(curr_lat))
-                lat_text.text = ' '*pad_length + '{0:.4f}'.format(curr_lat)
+                lat_text.text = ' ' * pad_length + '{0:.4f}'.format(curr_lat)
 
             if last_lon != curr_lon:
                 last_lon = curr_lon
                 pad_length = 9 - len('{0:.4f}'.format(curr_lon))
-                lon_text.text = ' '*pad_length + '{0:.4f}'.format(curr_lon)
+                lon_text.text = ' ' * pad_length + '{0:.4f}'.format(curr_lon)
 
             if last_grid_sq != curr_grid_sq:
                 last_grid_sq = curr_grid_sq
@@ -636,21 +659,21 @@ def main():
                 alt_feet = int(curr_alt * 3.28084)
                 meter_pad_length = 5 - len(str(curr_alt))
                 feet_pad_length = 5 - len(str(alt_feet))
-                alt_ft_text.text = ' '*feet_pad_length + str(alt_feet)
-                alt_m_text.text = ' '*meter_pad_length + str(curr_alt)
+                alt_ft_text.text = ' ' * feet_pad_length + str(alt_feet)
+                alt_m_text.text = ' ' * meter_pad_length + str(curr_alt)
 
             # UPDATE SPEED AND TRACK ANGLE LABELS IF DATA HAS CHANGED
             if last_speed != curr_speed:
                 last_speed = curr_speed
                 speed = '{0:.1f}'.format(curr_speed)
                 speed_pad_length = 5 - len(speed)
-                speed_text.text = ' '*speed_pad_length + speed
+                speed_text.text = ' ' * speed_pad_length + speed
 
             if last_track != curr_track:
                 last_track = curr_track
                 track = '{0:.1f}'.format(curr_track)
                 track_pad_length = 5 - len(track)
-                track_text.text = ' '*track_pad_length + track
+                track_text.text = ' ' * track_pad_length + track
 
             # UPDATE SATELLITE COUNT LABEL IF DATA HAS CHANGED
             if last_sat != curr_sat:
@@ -691,7 +714,7 @@ def main():
         if last_comp != curr_comp:
             last_comp = curr_comp
             pad_length = 3 - len(curr_comp)
-            comp_text.text = ' '*pad_length + curr_comp
+            comp_text.text = ' ' * pad_length + curr_comp
 
         # CHECK BATTERY VOLTAGE ONCE A MINUTE AND CALCULATE PERCENTAGE OF CHARGE
         curr_bat_time = time.monotonic()
@@ -760,5 +783,6 @@ def main():
             time.sleep(0.05)
 
         gps_update_text.text = ' '
+
 
 main()
